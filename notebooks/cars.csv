@@ -1,0 +1,37 @@
+Car,Model,Volume,Weight,CO2,Rating,Average Education
+Toyoty,Aygo,1000,missing,99.2768638,Good,bachelors
+Mitsubishi,Space Star,1200,missing,95.56552499,Excellent,bachelors
+Skoda,Citigo,1000,929,95.30810469,Good,masters
+Fiat,500,900,865,90.11197617,Bad,bachelors
+Mini,Cooper,1500,1140,105.0326182,Good,high school
+VW,Up!,1000,929,105.3072076,Excellent,masters
+Skoda,Fabia,1400,1109,90.61162851,Good,post doctorate
+Mercedes,A-Class,1500,1365,92.85424828,Good,high school
+Ford,Fiesta,1500,1112,98.1363696,Good,high school
+Audi,A1,,1150,99.62167792,Bad,high school
+Hyundai,I20,,980,99.18954812,Bad,masters
+Suzuki,Swift,1300,990,101.2436376,Bad,masters
+Ford,Fiesta,1000,1112,99.57311836,Bad,bachelors
+Honda,Civic,1600,1252,94.33835467,Bad,bachelors
+Hundai,I30,1600,1326,97.10199587,Bad,post doctorate
+Opel,Astra,1600,1330,97.26621802,Bad,bachelors
+BMW,1,1600,1365,99.73792442,Good,bachelors
+Mazda,3,2200,1280,104.6693314,Good,high school
+Skoda,Rapid,1600,1119,104.494966,Good,post doctorate
+Ford,Focus,2000,1328,105.9815837,Good,post doctorate
+Ford,Mondeo,1600,1584,94.24951323,Excellent,post doctorate
+Opel,Insignia,2000,1428,99.71179979,Excellent,high school
+Mercedes,C-Class,2100,1365,99.86142609,Excellent,high school
+Skoda,Octavia,1600,1415,99.41199277,Excellent,high school
+Volvo,S60,2000,1415,99.36833667,Good,bachelors
+Mercedes,CLA,1500,1465,102.6526535,Good,bachelors
+Audi,A4,2000,1490,104.3896075,Good,masters
+Audi,A6,2000,1725,114.6441144,Excellent,masters
+Volvo,V70,1600,1523,109.2541098,Good,post doctorate
+BMW,5,2000,1705,114.2754923,Good,post doctorate
+Mercedes,E-Class,2100,1605,115.7693711,Bad,high school
+Volvo,XC70,2000,1746,117.5546796,Bad,high school
+Ford,B-Max,1600,1235,104.6914988,Excellent,high school
+BMW,216,1600,1390,108.4207381,Bad,masters
+Opel,Zafira,1600,1405,109.0210718,Excellent,post doctorate
+Mercedes,SLK,2500,1395,120.8028446,Bad,bachelors
