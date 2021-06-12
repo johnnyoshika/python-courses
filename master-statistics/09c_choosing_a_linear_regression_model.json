@@ -1,0 +1,304 @@
+{
+ "metadata": {
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.2"
+  },
+  "orig_nbformat": 4,
+  "kernelspec": {
+   "name": "python3",
+   "display_name": "Python 3.9.2 64-bit"
+  },
+  "interpreter": {
+   "hash": "3e51c8fce8865fe7ce19d319b84dc281172c29fab73b40f06b05bf6ddc25df62"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2,
+ "cells": [
+  {
+   "source": [
+    "# Choosing a linear regression model"
+   ],
+   "cell_type": "markdown",
+   "metadata": {}
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "0.08744762039820442\n0.38833244734371797\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "import statsmodels.api as sm\n",
+    "\n",
+    "bikes = pd.read_csv('09c_bike_rentals.csv')\n",
+    "\n",
+    "# Fit model for number of bike rentals based on temp, wind speed, and holidy\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + windspeed + holiday', data=bikes).fit()\n",
+    "\n",
+    "# Fit model for number of bike rentals based on humidity, season, and weekday\n",
+    "model2 = sm.OLS.from_formula('cnt ~ hum + season + weekday', data=bikes).fit()\n",
+    "\n",
+    "print(model1.rsquared)\n",
+    "print(model2.rsquared)\n",
+    "\n",
+    "# We should choose model2 because it explains 39% of hte variation in rental prices, whereas model1 only explains 9%.abs\n",
+    "\n",
+    "# Note: these number differ from the Codeacademy exercise, as numbers is some columns of 09c_bike_rentals.csv came in the absolute form and lost the negative sign."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "0.08744762039820442\n0.1217451904320086\n0.1237608190976559\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Nested models\n",
+    "\n",
+    "# Nested models are when one model contains all of the predictors of another model, plus more predictors.\n",
+    "\n",
+    "# Example\n",
+    "\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + windspeed + holiday', data=bikes).fit() \n",
+    "\n",
+    "model2 = sm.OLS.from_formula('cnt ~ temp + windspeed + holiday + hum', data=bikes).fit() \n",
+    "\n",
+    "model3 = sm.OLS.from_formula('cnt ~ temp + windspeed + holiday + hum + weekday', data=bikes).fit() \n",
+    "\n",
+    "# R-squared will always increase with more models, but it introduces the danger of overfitting\n",
+    "print(model1.rsquared)\n",
+    "print(model2.rsquared)\n",
+    "print(model3.rsquared)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "0.4277263404636258\n0.5252987439693118\n0.42138535808649147\n0.519373208179747\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Adjusted R-Squared\n",
+    "\n",
+    "# To address the overfitting problem when comparing nested models with R-squared, we can use the adjusted R-squared\n",
+    "\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + hum + windspeed + season + holiday + weekday', data=bikes).fit()\n",
+    "\n",
+    "model2 = sm.OLS.from_formula('cnt ~ temp + hum + windspeed + season + holiday + weekday + atemp', data=bikes).fit()\n",
+    "\n",
+    "# Print R-squared for both models\n",
+    "print(model1.rsquared)\n",
+    "print(model2.rsquared)\n",
+    "\n",
+    "# Print adjusted R-squared for both models\n",
+    "print(model1.rsquared_adj)\n",
+    "print(model2.rsquared_adj)\n",
+    "\n",
+    "# In our example, the desired model doesn't change between r-squared and adjsuted r-squared, but it does in CodeAcademy's example without the problem in their dataset."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "   df_resid           ssr  df_diff       ss_diff           F        Pr(>F)\n0     727.0  2.420884e+09      0.0           NaN         NaN           NaN\n1     725.0  1.523878e+09      2.0  8.970059e+08  213.379661  1.345544e-73\n"
+     ]
+    }
+   ],
+   "source": [
+    "from statsmodels.stats.anova import anova_lm\n",
+    "\n",
+    "# F-Test\n",
+    "\n",
+    "# F-Test is a hypothesis test. Null hypothesis is that adding additional predictors will have zero impact.\n",
+    "\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + hum + windspeed', data=bikes).fit() \n",
+    "\n",
+    "# Fit model2\n",
+    "model2 = sm.OLS.from_formula('cnt ~ temp + hum + windspeed + weekday + atemp', data=bikes).fit() \n",
+    "\n",
+    "# Run the F-test and print results\n",
+    "anova_results = anova_lm(model1, model2)\n",
+    "print(anova_results)\n",
+    "\n",
+    "# Looking at the bottom right of the table (1.3e-73), that's way below the significance threshold of 0.05, so we would choose model2, as either weekday or atemp or both have a significant impact on the prediction."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "-6536.23942100731\n-6390.018746204252\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Log-Likelihood\n",
+    "\n",
+    "# While r-squared, adjusted r-squared, F-Test are good for comparing models of observed data, for new and unobserved data, a likelihood based criteria (e.g. Log-likelihood) is preferred\n",
+    "\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + windspeed + holiday', data=bikes).fit() \n",
+    "\n",
+    "model2 = sm.OLS.from_formula('cnt ~ hum + season + weekday', data=bikes).fit() \n",
+    "\n",
+    "# Print log likelihood for both models\n",
+    "print(model1.llf)\n",
+    "print(model2.llf)\n",
+    "\n",
+    "# Pick model2 b/c it's larger. Smaller negative value is larger."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "-6365.686819982299\n-6297.363308766438\n12749.373639964599\n12614.726617532877\n12790.723361102346\n12660.670752130374\n"
+     ]
+    }
+   ],
+   "source": [
+    "# AIC and BIC\n",
+    "\n",
+    "# Similar to how adjusted r-squred penalizes r-squred for more predictors, Akaike information criterion (AIC) and Bayesian information criterion (BIC) do the same thing for log-likelihood. AIC and BIC use negative log likelihood, so we the model with the lowest AIC or BIC.\n",
+    "\n",
+    "# AIC and BIC are similar, but BIC gives a bigger penalty for each additional predictor, so it is used for finding the best “simple” model. This is useful because it makes the model more interpretable.\n",
+    "\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + hum + windspeed + season + holiday + weekday', data=bikes).fit()\n",
+    "\n",
+    "# Fit model2\n",
+    "model2 = sm.OLS.from_formula('cnt ~ temp + hum + windspeed + season + holiday + weekday + atemp', data=bikes).fit()\n",
+    "\n",
+    "# Print log likelihood for both models\n",
+    "print(model1.llf)\n",
+    "print(model2.llf)\n",
+    "\n",
+    "# Which model based on log likelihood?\n",
+    "which_model_loglik = 'model1'\n",
+    "\n",
+    "# Print AIC for both models\n",
+    " \n",
+    "print(model1.aic)\n",
+    "print(model2.aic)\n",
+    "\n",
+    "# Which model based on AIC?\n",
+    "which_model_aic = 'model2'\n",
+    "\n",
+    "# Print BIC for both models\n",
+    "print(model1.bic)\n",
+    "print(model2.bic)\n",
+    "\n",
+    "# Which model based on BIC?\n",
+    "which_model_bic = 'model2'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [
+    {
+     "output_type": "stream",
+     "name": "stdout",
+     "text": [
+      "1403.8695909996406\n1385.1845074736311\n"
+     ]
+    }
+   ],
+   "source": [
+    "#  Training and Test Sets\n",
+    "\n",
+    "# Another way of choosing a model to make predictions for new data (also called out-of-sample prediction) is by using training and test datasets. The idea is that we only use PART of our data to fit the model, then we see how well the model performs in predicting the outcome of interest for the rest of our data. \n",
+    "\n",
+    "import numpy as np\n",
+    "import statsmodels.api as sm\n",
+    "\n",
+    "# Split bikes data\n",
+    "indices = range(len(bikes))\n",
+    "s = int(0.8*len(indices))\n",
+    "train_ind = np.random.choice(indices, size = s, replace = False)\n",
+    "test_ind = list(set(indices) - set(train_ind))\n",
+    "bikes_train = bikes.iloc[train_ind]\n",
+    "bikes_test = bikes.iloc[test_ind]\n",
+    "\n",
+    "# Fit model1\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + atemp + hum', data=bikes_train).fit()\n",
+    "\n",
+    "# Fit model2\n",
+    "model2 = sm.OLS.from_formula('cnt ~ season + windspeed + weekday', data=bikes_train).fit()\n",
+    "\n",
+    "# Fit model1\n",
+    "model1 = sm.OLS.from_formula('cnt ~ temp + atemp + hum', data=bikes_train).fit()\n",
+    "\n",
+    "# Fit model2\n",
+    "model2 = sm.OLS.from_formula('cnt ~ season + windspeed + weekday', data=bikes_train).fit()\n",
+    "\n",
+    "# Calculate predicted cnt based on model1\n",
+    "fitted1 = model1.predict(bikes_test)\n",
+    "\n",
+    "# Calculate predicted cnt based on model2\n",
+    "fitted2 = model2.predict(bikes_test)\n",
+    "\n",
+    "# Calculate PRMSE for model1\n",
+    "true = bikes_test.cnt\n",
+    "prmse1 = np.mean((true-fitted1)**2)**.5\n",
+    "\n",
+    "# Calculate PRMSE for model2\n",
+    "prmse2 = np.mean((true-fitted2)**2)**.5\n",
+    "\n",
+    "# Print PRMSE for both models\n",
+    "print(prmse1)\n",
+    "print(prmse2)\n",
+    "\n",
+    "# Which model based on log likelihood?\n",
+    "which_model = 'model1 b/c it is smaller'"
+   ]
+  }
+ ]
+}
